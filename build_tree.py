@@ -6,8 +6,8 @@ import re
 from intervaltree import IntervalTree
 import pandas as pd
 
-ccds_current_path = Path('/home/zhilinh/data/CCDS.current.txt').expanduser()
-
+ccds_current_path = Path('/scratch/lin/data/CCDS.current.txt').expanduser()
+gene_set = set()
 interval_separator = re.compile(r'\s*,\s*')
 
 with open(ccds_current_path) as f:
@@ -21,6 +21,7 @@ with open(ccds_current_path) as f:
         chrom_name = 'chr{}'.format(line['#chromosome'])
         intervals = interval_separator.split(line['cds_locations'].strip('[]'))
         gene_id = line['gene_id']
+        gene_set.add(gene_id)
         for interval in intervals:
             intervals_by_gene[gene_id].add((chrom_name, interval))
 

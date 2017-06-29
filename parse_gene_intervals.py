@@ -8,7 +8,7 @@ from build_tree import intervals_by_gene, gene_length, trees
 def main(geo_id):
     # Read the SAM file of an alignment.
     reads_counts = pd.Series(0, index=sorted(intervals_by_gene))
-    sam_path = Path('/home/zhilinh/reads.sam').expanduser()
+    sam_path = Path('/scratch/lin/' + geo_id + '.sam').expanduser()
     mapped_reads = 0
     total = 0
 
@@ -33,10 +33,11 @@ def main(geo_id):
 
     # If the overall alignment rate is lower than 20%, all reads will be discarded.
     if mapped_reads / total < 0.2:
+        print()
         return
 
     # Count the reads mapped to the genome and calculate the RPKM of each gene.
-    output = open('/home/zhilinh/' + geo_id + '.csv', 'wb')
+    output = open('/scratch/lin/' + geo_id + '.csv', 'wb')
     gene_count = 0
 
     # The unit of total reads count would be million.

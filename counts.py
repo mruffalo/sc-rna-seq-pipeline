@@ -1,27 +1,36 @@
 #!/usr/bin/env python3
 import os
+import csv
 import argparse
+from pathlib import Path
 
 
 def main(geo_id):
+    ccds_current_path = Path('/scratch/lin/data/CCDS.current.txt').expanduser()
+    gene_set = set()
+    with open(ccds_current_path) as f:
+        r = csv.DictReader(f, delimiter='\t')
+        for line in r:
+            gene_id = line['gene_id']
+            gene_set.add(gene_id)
+
     # Generate the RPKM matrix of cell profiles from the same project.
-    output = open('/home/zhilinh/' + geo_id + '.csv', 'wb')
-    genes = set()
+    output = open('/scratch/lin/' + geo_id + '.csv', 'wb')
     cells = {}
-    for root, dirs, files in os.walk("/home/zhilinh/output/"):
+    for root, dirs, files in os.walk("/scratch/lin/output/"):
         for name in files:
             if geo_id in name:
                 cells[name] = {}
-                lines = open('/home/zhilinh/output/' + name, 'r').readlines()
-                for line in lines:
-                    # Get all expressed genes in the experiments. Should give all genes.
-                    line = line.strip().split('\t')
-                    genes.add(line[0])
 
     # Walk through each cell and get the RPKM of genes.
-    genes = list(genes)
+    genes = list(gene_set)
+    line = 'GEO_ID\t'
+    for gene in genes:
+        line += gene + '\t'
+    line += '\n'
+    output.write(line.encode())
     for cell in cells.keys():
-        lines = open('/home/zhilinh/output/' + cell, 'r').readlines()
+        lines = open('/scratch/lin/output/' + cell, 'r').readlines()
         for line in lines:
             line = line.strip().split('\t')
             cells[cell][line[0]] = line[1]

@@ -11,14 +11,7 @@ def main():
     # subprocess.run("python3 parse_gene_intervals.py", shell=True)
     # subprocess.run("python3 counts.py", shell=True)
 
-    # env_command = [
-    #     'source',
-    #     'activate',
-    #     'tmp'
-    # ]
-    # check_call(env_command)
-
-    # Bulid up the interval tree of gene locations on chromosomes for once.
+    # Build up the interval tree of gene locations on chromosomes for once.
     tree_command = [
         'python3',
         'build_tree.py'
@@ -26,7 +19,7 @@ def main():
     check_call(tree_command)
 
     # Walk through all SRA files in the directory
-    for root, dirs, files in os.walk("/home/zhilinh/data/"):
+    for root, dirs, files in os.walk("/scratch/lin/data/"):
         for name in files:
             if ".sra" in name:
                 # Convert SRA files into FASTQ files.
@@ -39,7 +32,7 @@ def main():
                 fastq_command = [
                     piece.format(fastq_path='/home/zhilinh/tools/sratoolkit.2.8.2-1-centos_linux64/bin/fastq-dump',
                                  input_path=os.path.join(root, name),
-                                 output_path='/home/zhilinh/data/')
+                                 output_path='/scratch/lin/data/')
                     for piece in fastq_pieces
                 ]
                 check_call(fastq_command)
@@ -60,7 +53,7 @@ def main():
                     piece.format(hisat2_path='/home/zhilinh/tools/hisat2-2.1.0/hisat2',
                                  reference_path='/home/zhilinh/alignment/hisat2/combined2',
                                  input_path=os.path.join(root, name)[:-4] + '.fastq',
-                                 output_path='/home/zhilinh/reads.sam')
+                                 output_path='/scratch/lin/' + name[:-4] + '.sam')
                     for piece in hisat_pieces
                 ]
                 check_call(hisat_command)
