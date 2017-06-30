@@ -26,7 +26,7 @@ with open(ccds_current_path) as f:
             intervals_by_gene[gene_id].add((chrom_name, interval))
 
 trees = defaultdict(IntervalTree)
-gene_length = pd.Series(0, index=sorted(intervals_by_gene))
+gene_length = pd.Series(0.0, index=sorted(intervals_by_gene))
 
 for gene, interval_data in intervals_by_gene.items():
     chrom_dict = {}
