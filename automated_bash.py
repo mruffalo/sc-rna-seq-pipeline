@@ -32,9 +32,7 @@ HISAT2_COMMAND_TEMPLATE = [
 USERNAME = pwd.getpwuid(os.getuid())[0]
 
 def process_sra_file(sra_path: Path, subprocesses: int):
-    sra_name = sra_path.name
-
-    scratch_path = ensure_dir(SCRATCH_PATH / USERNAME / sra_name)
+    scratch_path = ensure_dir(SCRATCH_PATH / USERNAME / sra_path.stem)
 
     try:
         fastq_command = [
