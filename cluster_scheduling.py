@@ -42,7 +42,7 @@ with open(ftp_list_file) as f:
             '{script_filename}'
         ]
         permission_command = [piece.format(script_filename=script_filename) for piece in permission]
-        # check_call(permission_command)
+        check_call(permission_command)
 
         command = [piece.format(script_filename=script_filename) for piece in slurm_command]
         print('Running', ' '.join(command))

@@ -21,7 +21,7 @@ def main(geo_id):
     fastq_command = [
         piece.format(fastq_path='/home/zhilinh/tools/sratoolkit.2.8.2-1-centos_linux64/bin/fastq-dump',
                      input_path='/home/zhilinh/data/' + geo_id + '.sra',
-                     output_path='/home/zhilin/data/')
+                     output_path='/home/zhilinh/data/')
         for piece in fastq_pieces
     ]
     check_call(fastq_command)
