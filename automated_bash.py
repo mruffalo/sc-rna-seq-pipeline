@@ -52,6 +52,7 @@ def process_sra_file(sra_path: Path, subprocesses: int):
         # Align FASTQ files to the mouse genome using 24 cores.
         hisat_command = [
             piece.format(
+                hisat2_command=HISAT2_PATH,
                 reference_path=REFERENCE_INDEX_PATH,
                 input_path=fastq_path,
                 output_path=sam_path,
