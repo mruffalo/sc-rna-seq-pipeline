@@ -7,8 +7,7 @@ import pandas as pd
 from build_tree import intervals_by_gene, gene_length, trees
 from utils import DATA_PATH, append_to_filename, ensure_dir, replace_extension
 
-RPKM_DATA_PATH = DATA_PATH / 'rpkm'
-ensure_dir(RPKM_DATA_PATH)
+RPKM_DATA_PATH = ensure_dir(DATA_PATH / 'rpkm')
 
 def main(sam_path: Path):
     base_csv_path = replace_extension(sam_path, 'csv')
@@ -52,7 +51,6 @@ def main(sam_path: Path):
 
             for gene_id in gene_ids:
                 read_counts.loc[gene_id.data] += 1
-
 
     rpkm = (read_counts * 1000000) / (reads_total * gene_length)
     rpkm_csv_path = append_to_filename(base_csv_path, '_rpkm')
