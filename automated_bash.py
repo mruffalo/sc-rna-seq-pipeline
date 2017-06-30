@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-import subprocess
 import os
 from subprocess import check_call
-
 
 def main():
     # subprocess.run("fastq-dump /home/zhilinh/data/" + geoid, shell=True)
@@ -10,13 +8,6 @@ def main():
     #                + ".fastq -S /home/zhilinh/reads.sam -p 24", shell=True)
     # subprocess.run("python3 parse_gene_intervals.py", shell=True)
     # subprocess.run("python3 counts.py", shell=True)
-
-    # Build up the interval tree of gene locations on chromosomes for once.
-    tree_command = [
-        'python3',
-        'build_tree.py'
-    ]
-    check_call(tree_command)
 
     # Walk through all SRA files in the directory
     for root, dirs, files in os.walk("/scratch/lin/data/"):
