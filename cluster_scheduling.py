@@ -9,7 +9,7 @@ script_template = """
 #SBATCH --mincpus=1
 
 wget {ftp_url} -P /home/zhilinh/data
-python /home/zhilinh/convert_align_count {geo_id}
+python /home/zhilinh/convert_align_count.py {geo_id}
 """.strip()
 
 slurm_command = [
@@ -23,11 +23,12 @@ ftp_list_file = Path('/home/zhilinh/sra-ftp-paths.txt').expanduser()
 with open(ftp_list_file) as f:
     for line in f:
         # strip off ".sra" extension, save to "SRR*.sh".
-        index = line.strip().rfind('/')
+        line = line.strip()
+        index = line.rfind('/')
         geo_id = line[index + 1:][:-4]
         script_filename = '/home/zhilinh/data/' + geo_id + '.sh'
         # Fill in the script with each URL.
-        slurm_script = script_template.format(ftp_url=line.strip(), geo_id=geo_id)
+        slurm_script = script_template.format(ftp_url=line, geo_id=geo_id)
 
         # Create the bash script by the script_template
         bash_script = open(script_filename, 'w')
