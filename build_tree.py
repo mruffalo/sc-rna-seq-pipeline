@@ -6,7 +6,7 @@ import re
 from intervaltree import IntervalTree
 import pandas as pd
 
-ccds_current_path = Path('/scratch/lin/data/CCDS.current.txt').expanduser()
+ccds_current_path = Path('~/data/ccds/current_mouse/CCDS.current.txt').expanduser()
 gene_set = set()
 interval_separator = re.compile(r'\s*,\s*')
 
