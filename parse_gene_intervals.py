@@ -14,8 +14,7 @@ def main(geo_id):
 
     with open(sam_path) as f:
         # Read each line of the SAM file.
-        r = f.readlines()
-        for line in r:
+        for line in f:
             # Filter out the line that is not a read.
             if line.startswith('@'):
                 continue
