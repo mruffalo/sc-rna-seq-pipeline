@@ -1,65 +1,91 @@
 #!/usr/bin/env python3
+from argparse import ArgumentParser
 import os
+from pathlib import Path
+import pwd
+from shutil import rmtree
 from subprocess import check_call
 
-def main():
-    # subprocess.run("fastq-dump /home/zhilinh/data/" + geoid, shell=True)
-    # subprocess.run("hisat2 -x /home/zhilinh/alignment/hisat2/combined2 -U /home/zhilinh/data/" + geoid
-    #                + ".fastq -S /home/zhilinh/reads.sam -p 24", shell=True)
-    # subprocess.run("python3 parse_gene_intervals.py", shell=True)
-    # subprocess.run("python3 counts.py", shell=True)
+from parse_gene_intervals import parse_gene_intervals
+from paths import *
+from utils import SCRATCH_PATH, ensure_dir, pathlib_walk_glob, replace_extension
 
+FASTQ_CONVERT_COMMAND_TEMPLATE = [
+    '{fastq_dump_command}',
+    '{input_path}',
+    '-O',
+    '{output_path}',
+]
+
+HISAT2_COMMAND_TEMPLATE = [
+    '{hisat2_command}',
+    '-x',
+    '{reference_path}',
+    '-U',
+    '{input_path}',
+    '-S',
+    '{output_path}',
+    '-p',
+    '{subprocesses}',
+]
+
+USERNAME = pwd.getpwuid(os.getuid())[0]
+
+def process_sra_file(sra_path: Path, subprocesses: int):
+    sra_name = sra_path.name
+
+    scratch_path = ensure_dir(SCRATCH_PATH / USERNAME / sra_name)
+
+    try:
+        fastq_command = [
+            piece.format(
+                fastq_dump_command=FASTQ_DUMP_PATH,
+                input_path=sra_path,
+                output_path=scratch_path,
+            )
+            for piece in FASTQ_CONVERT_COMMAND_TEMPLATE
+        ]
+        print('Running', ' '.join(fastq_command))
+        check_call(fastq_command)
+
+        fastq_path = scratch_path / replace_extension(sra_path, 'fastq').name
+        sam_path = replace_extension(fastq_path, 'sam')
+
+        # Align FASTQ files to the mouse genome using 24 cores.
+        hisat_command = [
+            piece.format(
+                reference_path=REFERENCE_INDEX_PATH,
+                input_path=fastq_path,
+                output_path=sam_path,
+                subprocesses=subprocesses,
+            )
+            for piece in HISAT2_COMMAND_TEMPLATE
+        ]
+        print('Running', ' '.join(hisat_command))
+        check_call(hisat_command)
+
+        print('Computing RPKM from', sam_path)
+        parse_gene_intervals(sam_path)
+
+    finally:
+        print('Deleting', scratch_path)
+        rmtree(scratch_path)
+
+def main(subprocesses: int):
     # Walk through all SRA files in the directory
-    for root, dirs, files in os.walk("/scratch/lin/data/"):
-        for name in files:
-            if ".sra" in name:
-                # Convert SRA files into FASTQ files.
-                fastq_pieces = [
-                    '{fastq_path}',
-                    '{input_path}',
-                    '-O',
-                    '{output_path}'
-                ]
-                fastq_command = [
-                    piece.format(fastq_path='/home/zhilinh/tools/sratoolkit.2.8.2-1-centos_linux64/bin/fastq-dump',
-                                 input_path=os.path.join(root, name),
-                                 output_path='/scratch/lin/data/')
-                    for piece in fastq_pieces
-                ]
-                check_call(fastq_command)
-
-                # Align FASTQ files to the mouse genome using 24 cores.
-                hisat_pieces = [
-                    '{hisat2_path}',
-                    '-x',
-                    '{reference_path}',
-                    '-U',
-                    '{input_path}',
-                    '-S',
-                    '{output_path}',
-                    '-p',
-                    '24'
-                ]
-                hisat_command = [
-                    piece.format(hisat2_path='/home/zhilinh/tools/hisat2-2.1.0/hisat2',
-                                 reference_path='/home/zhilinh/alignment/hisat2/combined2',
-                                 input_path=os.path.join(root, name)[:-4] + '.fastq',
-                                 output_path='/scratch/lin/' + name[:-4] + '.sam')
-                    for piece in hisat_pieces
-                ]
-                check_call(hisat_command)
-
-                # Count reads and print out stats.
-                count_piece = [
-                    'python3',
-                    'parse_gene_intervals.py',
-                    '{name}'
-                ]
-                count_command = [
-                    piece.format(name=name[:-4])
-                    for piece in count_piece
-                ]
-                check_call(count_command)
+    data_path = SCRATCH_PATH / USERNAME / 'data'
+    for sra_path in pathlib_walk_glob(data_path, '*.sra'):
+        process_sra_file(sra_path, subprocesses)
 
 if __name__ == '__main__':
-    main()
+    p = ArgumentParser()
+    p.add_argument(
+        '-s',
+        '--subprocesses',
+        help='Number of subprocesses for alignment in each run of HISAT2',
+        type=int,
+        default=1
+    )
+    args = p.parse_args()
+
+    main(args.subprocesses)
