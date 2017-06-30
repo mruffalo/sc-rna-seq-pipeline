@@ -7,10 +7,11 @@ import pandas as pd
 from build_tree import intervals_by_gene, gene_length, trees
 from utils import DATA_PATH, append_to_filename, ensure_dir, replace_extension
 
-RPKM_DATA_PATH = ensure_dir(DATA_PATH / 'rpkm')
-
-def main(sam_path: Path):
-    base_csv_path = replace_extension(sam_path, 'csv')
+def parse_gene_intervals(sam_path: Path):
+    # Save RPKM and summary CSV files to home directory, not wherever the SAM
+    # file is (probably somewhere in /scratch)
+    rpkm_data_path = ensure_dir(DATA_PATH / 'rpkm')
+    base_csv_path = rpkm_data_path / replace_extension(sam_path, 'csv').name
 
     # Read the SAM file of an alignment.
     read_counts = pd.Series(0, index=sorted(intervals_by_gene))
@@ -83,4 +84,4 @@ if __name__ == '__main__':
     parser.add_argument('sam_path', type=Path, help='Path to SAM file')
     args = parser.parse_args()
 
-    main(args.sam_path)
+    parse_gene_intervals(args.sam_path)
