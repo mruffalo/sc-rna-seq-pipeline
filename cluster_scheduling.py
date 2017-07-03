@@ -8,8 +8,8 @@ script_template = """
 #SBATCH --mem=4096
 #SBATCH --mincpus=1
 
-wget {ftp_url} -P /home/zhilinh/data
-python /home/zhilinh/convert_align_count.py {geo_id}
+wget {ftp_url} -P /scratch/zhilinh/data/
+python3 /home/zhilinh/automated_bash.py
 """.strip()
 
 slurm_command = [
@@ -22,28 +22,30 @@ ftp_list_file = Path('/home/zhilinh/sra-ftp-paths.txt').expanduser()
 
 with open(ftp_list_file) as f:
     for line in f:
-        # strip off ".sra" extension, save to "SRR*.sh".
-        line = line.strip()
-        index = line.rfind('/')
-        geo_id = line[index + 1:][:-4]
-        script_filename = '/home/zhilinh/data/' + geo_id + '.sh'
-        # Fill in the script with each URL.
-        slurm_script = script_template.format(ftp_url=line, geo_id=geo_id)
+        # strip off ".sra" extension.
+        ftp_url = line.strip()
+        slash_index = ftp_url.rfind('/')
+        geo_id = ftp_url[slash_index + 1:][:-4]
+        script_path = '/home/zhilinh/data/' + geo_id + '.sh'
+        sra_path = '/home/zhilinh/data/' + geo_id + '.sra'
+        # Fill in the script with SRA file path and URL.
+        slurm_script = script_template.format(sra_path=sra_path, ftp_url=ftp_url)
 
-        # Create the bash script by the script_template
-        bash_script = open(script_filename, 'w')
+        # Create the bash script by the script_template.
+        bash_script = open(script_path, 'w')
         bash_script.write(slurm_script)
         bash_script.close()
 
-        # Not sure if permission needed
+        # Not sure if permission needed.
         permission = [
             'chmod',
             '+x',
             '{script_filename}'
         ]
-        permission_command = [piece.format(script_filename=script_filename) for piece in permission]
+        permission_command = [piece.format(script_filename=script_path) for piece in permission]
         check_call(permission_command)
 
-        command = [piece.format(script_filename=script_filename) for piece in slurm_command]
+        # Run the bash script just crated for every SRA file.
+        command = [piece.format(script_filename=script_path) for piece in slurm_command]
         print('Running', ' '.join(command))
         check_call(command)
