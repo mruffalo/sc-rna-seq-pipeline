@@ -8,7 +8,7 @@ from utils import create_slurm_path
 script_template = """
 #!/bin/bash
 
-#SBATCH -p zbj1
+#SBATCH -p {pool}
 #SBATCH --mem=8192
 #SBATCH --mincpus=1
 
@@ -23,13 +23,17 @@ SBATCH_COMMAND_TEMPLATE = [
 
 SCRIPT_FILENAME = 'bulk_download.sh'
 
-def queue_jobs(ftp_list_file: Path, array_index_spec: str):
+def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str):
     slurm_path = create_slurm_path('cluster_scheduling')
 
     script_file = slurm_path / SCRIPT_FILENAME
     print('Saving script to', script_file)
     with open(script_file, 'w') as f:
-        print(script_template.format(ftp_list_file=ftp_list_file), file=f)
+        script_content = script_template.format(
+            ftp_list_file=ftp_list_file,
+            pool=pool,
+        )
+        print(script_content, file=f)
 
     slurm_command = [
         piece.format(
@@ -52,6 +56,7 @@ if __name__ == '__main__':
             'call. See https://slurm.schedmd.com/job_array.html for more information.'
         ),
     )
+    p.add_argument('--pool', nargs='?', default='zbj1', help='Node pool')
     args = p.parse_args()
 
-    queue_jobs(args.ftp_list_file, args.array_index_spec)
+    queue_jobs(args.ftp_list_file, args.array_index_spec, args.pool)
