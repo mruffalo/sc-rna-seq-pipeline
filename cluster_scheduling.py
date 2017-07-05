@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+from argparse import ArgumentParser
 from subprocess import check_call
 from pathlib import Path
+
+from utils import create_slurm_path
 
 script_template = """
 #!/bin/bash
@@ -8,44 +12,46 @@ script_template = """
 #SBATCH --mem=4096
 #SBATCH --mincpus=1
 
-wget {ftp_url} -P /scratch/zhilinh/data/
-python3 /home/zhilinh/automated_bash.py
+python3 process_sra_from_ftp.py {ftp_list_file}
 """.strip()
 
-slurm_command = [
+SBATCH_COMMAND_TEMPLATE = [
     'sbatch',
+    '--array={array_index_spec}',
     '{script_filename}',
 ]
 
-# Import the list of URLs.
-ftp_list_file = Path('/home/zhilinh/sra-ftp-paths.txt').expanduser()
+SCRIPT_FILENAME = 'bulk_download.sh'
 
-with open(ftp_list_file) as f:
-    for line in f:
-        # strip off ".sra" extension.
-        ftp_url = line.strip()
-        slash_index = ftp_url.rfind('/')
-        geo_id = ftp_url[slash_index + 1:][:-4]
-        script_path = '/home/zhilinh/data/' + geo_id + '.sh'
-        sra_path = '/home/zhilinh/data/' + geo_id + '.sra'
-        # Fill in the script with SRA file path and URL.
-        slurm_script = script_template.format(sra_path=sra_path, ftp_url=ftp_url)
+def queue_jobs(ftp_list_file: Path, array_index_spec: str):
+    slurm_path = create_slurm_path('cluster_scheduling')
 
-        # Create the bash script by the script_template.
-        bash_script = open(script_path, 'w')
-        bash_script.write(slurm_script)
-        bash_script.close()
+    script_file = slurm_path / SCRIPT_FILENAME
+    print('Saving script to', script_file)
+    with open(script_file, 'w') as f:
+        print(script_template.format(ftp_list_file=ftp_list_file), file=f)
 
-        # Not sure if permission needed.
-        permission = [
-            'chmod',
-            '+x',
-            '{script_filename}'
-        ]
-        permission_command = [piece.format(script_filename=script_path) for piece in permission]
-        check_call(permission_command)
+    slurm_command = [
+        piece.format(
+            array_index_spec=array_index_spec,
+            script_filename=script_file,
+        )
+        for piece in SBATCH_COMMAND_TEMPLATE
+    ]
+    print('Running', ' '.join(slurm_command))
+    check_call(slurm_command)
 
-        # Run the bash script just crated for every SRA file.
-        command = [piece.format(script_filename=script_path) for piece in slurm_command]
-        print('Running', ' '.join(command))
-        check_call(command)
+if __name__ == '__main__':
+    p = ArgumentParser()
+    p.add_argument('ftp_list_file', type=Path)
+    p.add_argument(
+        'array_index_spec',
+        help=(
+            'Selection of FTP URLs to process, in Slurm array format. Examples: "0-10", "1,3,5,7". '
+            'Note that this parameter is not validated here and is passed as-is to the Slurm `sbatch` '
+            'call. See https://slurm.schedmd.com/job_array.html for more information.'
+        ),
+    )
+    args = p.parse_args()
+
+    queue_jobs(args.ftp_list_file, args.array_index_spec)

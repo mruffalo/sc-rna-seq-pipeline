@@ -15,6 +15,7 @@ will be submitted to the cluster in parallel.
 
 from argparse import ArgumentParser
 from ftplib import FTP
+import os
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
@@ -53,9 +54,23 @@ def process_sra_from_ftp(ftp_url: str, subprocesses: int):
     local_path = download_ftp_url(ftp_url)
     process_sra_file(local_path, subprocesses)
 
+def get_ftp_url(ftp_list_file: Path) -> str:
+    """
+    Reads `ftp_list_file` and returns the item selected by the SLURM_ARRAY_TASK_ID
+    environment variable. This is a separate function so the full list of URLs can
+    be garbage collected afterward -- I don't think this will use much memory at all,
+    but may as well not keep more things alive in memory than we need to.
+    """
+    with open(ftp_list_file) as f:
+        ftp_urls = [line.strip() for line in f]
+
+    file_index = int(os.environ['SLURM_ARRAY_TASK_ID'])
+
+    return ftp_urls[file_index]
+
 if __name__ == '__main__':
     p = ArgumentParser()
-    p.add_argument('ftp_url')
+    p.add_argument('ftp_list_file', type=Path)
     p.add_argument(
         '-s',
         '--subprocesses',
@@ -65,4 +80,5 @@ if __name__ == '__main__':
     )
     args = p.parse_args()
 
-    process_sra_from_ftp(args.ftp_url, args.subprocesses)
+    ftp_url = get_ftp_url(args.ftp_list_file)
+    process_sra_from_ftp(ftp_url, args.subprocesses)
