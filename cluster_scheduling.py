@@ -9,7 +9,7 @@ script_template = """
 #!/bin/bash
 
 #SBATCH -p zbj1
-#SBATCH --mem=4096
+#SBATCH --mem=8192
 #SBATCH --mincpus=1
 
 python3 process_sra_from_ftp.py {ftp_list_file}

@@ -4,7 +4,7 @@ from pathlib import Path
 from shutil import rmtree
 from subprocess import check_call
 
-from parse_gene_intervals import parse_gene_intervals
+from map_reads_to_genes import map_reads_to_genes
 from paths import *
 from utils import SCRATCH_PATH, USERNAME, ensure_dir, pathlib_walk_glob, replace_extension
 
@@ -60,7 +60,7 @@ def process_sra_file(sra_path: Path, subprocesses: int):
         check_call(hisat_command)
 
         print('Computing RPKM from', sam_path)
-        parse_gene_intervals(sam_path)
+        map_reads_to_genes(sam_path)
 
     finally:
         print('Deleting', scratch_path)
