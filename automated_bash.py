@@ -79,7 +79,7 @@ if __name__ == '__main__':
         '--subprocesses',
         help='Number of subprocesses for alignment in each run of HISAT2',
         type=int,
-        default=1
+        default=1,
     )
     args = p.parse_args()
 

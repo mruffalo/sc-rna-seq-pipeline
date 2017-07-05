@@ -10,9 +10,9 @@ script_template = """
 
 #SBATCH -p {pool}
 #SBATCH --mem=8192
-#SBATCH --mincpus=1
+#SBATCH --mincpus={subprocesses}
 
-python3 process_sra_from_ftp.py {ftp_list_file}
+python3 process_sra_from_ftp.py -s {subprocesses} {ftp_list_file}
 """.strip()
 
 SBATCH_COMMAND_TEMPLATE = [
@@ -23,7 +23,7 @@ SBATCH_COMMAND_TEMPLATE = [
 
 SCRIPT_FILENAME = 'bulk_download.sh'
 
-def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str):
+def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str, subprocesses: int):
     slurm_path = create_slurm_path('cluster_scheduling')
 
     script_file = slurm_path / SCRIPT_FILENAME
@@ -32,6 +32,7 @@ def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str):
         script_content = script_template.format(
             ftp_list_file=ftp_list_file,
             pool=pool,
+            subprocesses=subprocesses,
         )
         print(script_content, file=f)
 
@@ -56,7 +57,8 @@ if __name__ == '__main__':
             'call. See https://slurm.schedmd.com/job_array.html for more information.'
         ),
     )
-    p.add_argument('--pool', nargs='?', default='zbj1', help='Node pool')
+    p.add_argument('--pool', default='zbj1', help='Node pool')
+    p.add_argument('-s', '--subprocesses', type=int, default=1)
     args = p.parse_args()
 
-    queue_jobs(args.ftp_list_file, args.array_index_spec, args.pool)
+    queue_jobs(args.ftp_list_file, args.array_index_spec, args.pool, args.subprocesses)
