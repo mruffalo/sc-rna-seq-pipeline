@@ -42,7 +42,7 @@ def download_ftp_url(ftp_url: str) -> Path:
         # pathlib is too convenient not to use here, but FTP paths always have
         # POSIX path semantics, so use PurePosixPath to not get Windows-specific
         # things like path separators if running on that platform
-        ftp.cwd(ftp_path.parent)
+        ftp.cwd(str(ftp_path.parent))
 
         with open(local_path, 'wb') as f:
             print(f'Downloading {ftp_url} to {local_path}')
