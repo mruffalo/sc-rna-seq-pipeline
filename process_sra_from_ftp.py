@@ -18,6 +18,9 @@ from ftplib import FTP
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
+from automated_bash import process_sra_file
+from utils import SCRATCH_PATH, USERNAME, ensure_dir
+
 FTP_HOST_DEFAULT = 'ftp.ncbi.nlm.nih.gov'
 
 def create_ftp_session(ftp_host=FTP_HOST_DEFAULT) -> FTP:
@@ -29,19 +32,37 @@ def create_ftp_session(ftp_host=FTP_HOST_DEFAULT) -> FTP:
 
 def download_ftp_url(ftp_url: str) -> Path:
     url_pieces = urlparse(ftp_url)
+    ftp_path = PurePosixPath(url_pieces.path)
+    srr_name = ftp_path.stem
+    srr_dir = ensure_dir(SCRATCH_PATH / USERNAME / srr_name)
+    local_path = srr_dir / ftp_path.name
+
     with create_ftp_session(url_pieces.netloc) as ftp:
         # pathlib is too convenient not to use here, but FTP paths always have
         # POSIX path semantics, so use PurePosixPath to not get Windows-specific
         # things like path separators if running on that platform
-        ftp_path = PurePosixPath(url_pieces.path)
         ftp.cwd(ftp_path.parent)
 
-def process_sra_from_ftp(ftp_url: str):
+        with open(local_path, 'wb') as f:
+            print(f'Downloading {ftp_url} to {local_path}')
+            ftp.retrbinary(f'RETR {ftp_path.name}', f.write)
+
+    return local_path
+
+def process_sra_from_ftp(ftp_url: str, subprocesses: int):
     local_path = download_ftp_url(ftp_url)
+    process_sra_file(local_path, subprocesses)
 
 if __name__ == '__main__':
     p = ArgumentParser()
     p.add_argument('ftp_url')
+    p.add_argument(
+        '-s',
+        '--subprocesses',
+        help='Number of subprocesses for alignment in each run of HISAT2',
+        type=int,
+        default=1
+    )
     args = p.parse_args()
 
-    process_sra_from_ftp(args.ftp_url)
+    process_sra_from_ftp(args.ftp_url, args.subprocesses)
