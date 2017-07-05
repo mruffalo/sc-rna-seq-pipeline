@@ -2,9 +2,13 @@
 from collections import defaultdict
 import csv
 from pathlib import Path
+import pickle
 import re
+
 from intervaltree import IntervalTree
 import pandas as pd
+
+from utils import create_data_path
 
 ccds_current_path = Path('~/data/ccds/current_mouse/CCDS.current.txt').expanduser()
 gene_set = set()
@@ -57,3 +61,16 @@ for gene, interval_data in intervals_by_gene.items():
         # If a gene is located at different chroms, will it has different length?
         # The unit of gene length would be kb.
         gene_length.loc[gene] = (chrom_dict[chrom][1] - chrom_dict[chrom][0]) / 1000
+
+data_path = create_data_path('build_tree')
+pickle_file = data_path / 'trees.pickle'
+print('Saving interval trees to', pickle_file)
+
+data_to_save = {
+    'trees': trees,
+    'gene_length': gene_length,
+    'intervals_by_gene': intervals_by_gene,
+}
+
+with open(pickle_file, 'wb') as f:
+    pickle.dump(data_to_save, f)

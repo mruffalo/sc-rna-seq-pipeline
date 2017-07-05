@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
+import pickle
 
 import pandas as pd
 
-from build_tree import intervals_by_gene, gene_length, trees
-from utils import DATA_PATH, append_to_filename, ensure_dir, replace_extension
+from utils import DATA_PATH, append_to_filename, ensure_dir, find_newest_data_path, replace_extension
 
 def parse_gene_intervals(sam_path: Path):
+    tree_path = find_newest_data_path('build_tree')
+    with open(tree_path / 'trees.pickle', 'rb') as f:
+        tree_data = pickle.load(f)
+
+        trees = tree_data['trees']
+        gene_length = tree_data['gene_length']
+        intervals_by_gene = tree_data['intervals_by_gene']
+
     # Save RPKM and summary CSV files to home directory, not wherever the SAM
     # file is (probably somewhere in /scratch)
     rpkm_data_path = ensure_dir(DATA_PATH / 'rpkm')
