@@ -2,3 +2,5 @@
 __pycache__/
 paths_override.py
 data
+slurm_generated/
+slurm*.out
