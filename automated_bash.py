@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
-import os
 from pathlib import Path
-import pwd
 from shutil import rmtree
 from subprocess import check_call
 
 from parse_gene_intervals import parse_gene_intervals
 from paths import *
-from utils import SCRATCH_PATH, ensure_dir, pathlib_walk_glob, replace_extension
+from utils import SCRATCH_PATH, USERNAME, ensure_dir, pathlib_walk_glob, replace_extension
 
 FASTQ_CONVERT_COMMAND_TEMPLATE = [
     '{fastq_dump_command}',
@@ -28,8 +26,6 @@ HISAT2_COMMAND_TEMPLATE = [
     '-p',
     '{subprocesses}',
 ]
-
-USERNAME = pwd.getpwuid(os.getuid())[0]
 
 def process_sra_file(sra_path: Path, subprocesses: int):
     scratch_path = ensure_dir(SCRATCH_PATH / USERNAME / sra_path.stem)

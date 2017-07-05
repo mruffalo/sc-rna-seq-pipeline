@@ -1,8 +1,9 @@
 from datetime import datetime
 from itertools import cycle, islice, zip_longest
 from math import factorial
-from os import environ, PathLike, scandir
+from os import environ, getuid, PathLike, scandir
 from pathlib import Path
+import pwd
 from subprocess import Popen, check_output
 from typing import Iterable, List, Sequence, Tuple, TypeVar
 
@@ -19,6 +20,8 @@ SLURM_PATH = Path('slurm_generated')
 
 # Depends on running on a Lane cluster node
 SCRATCH_PATH = Path("/scratch")
+
+USERNAME = pwd.getpwuid(getuid())[0]
 
 SLURM_SUBMIT_COMMAND_TEMPLATE = [
     'sbatch',
