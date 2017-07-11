@@ -144,7 +144,7 @@ def create_output_path(description: str, print_path=True) -> Path:
 
 def create_data_path(description: str, print_path=True) -> Path:
     data_path = create_path(DATA_PATH, description, 'Data', print_path)
-    write_git_data(data_path)
+    # write_git_data(data_path)
     return data_path
 
 def create_slurm_path(description: str, print_path=True) -> Path:

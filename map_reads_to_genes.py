@@ -65,13 +65,9 @@ def map_reads_to_genes(sam_path: Path):
 
     rpkm = (read_counts * 1000000) / (reads_total * gene_length)
     print('Saving RPKM values to', rpkm_csv_path)
-    rpkm.to_csv(rpkm_csv_path)
+    rpkm.to_csv(str(rpkm_csv_path))
 
     gene_count = (read_counts > 0).sum()
-
-    print('Reads (+1000bp):', reads_mapped_to_genes)
-    print('Genes (+1000bp):', gene_count)
-    print('Total:', reads_total)
 
     summary_data = pd.Series(
         {
@@ -83,7 +79,7 @@ def map_reads_to_genes(sam_path: Path):
     )
     summary_csv_path = summary_data_path / csv_filename
     print('Saving summary data to', summary_csv_path)
-    summary_data.to_csv(summary_csv_path)
+    summary_data.to_csv(str(summary_csv_path))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

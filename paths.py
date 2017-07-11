@@ -5,8 +5,8 @@ from pathlib import Path as _Path
 # matter whether these values are of type `str` or `Path`. Might be useful
 # to use `Path` objects in overrides though, for things like `Path.expanduser`.
 
-FASTQ_DUMP_PATH = _Path('fastq-dump')
-HISAT2_PATH = _Path('hisat2')
+FASTQ_DUMP_PATH = _Path('/home/zhilinh/tools/sratoolkit.2.8.2-1-centos_linux64/bin/fastq-dump')
+HISAT2_PATH = _Path('/home/zhilinh/tools/hisat2-2.1.0/hisat2')
 # Not an actual file on disk; this is the "base" name
 REFERENCE_INDEX_PATH = _Path('~/data/hisat2-indexes/mm10-splice-sites/mm10').expanduser()
 
