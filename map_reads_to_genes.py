@@ -18,8 +18,8 @@ def map_reads_to_genes(sam_path: Path):
 
     # Save RPKM and summary CSV files to home directory, not wherever the SAM
     # file is (probably somewhere in /scratch)
-    rpkm_data_path = ensure_dir(DATA_PATH / 'rpkm')
-    summary_data_path = ensure_dir(DATA_PATH / 'summary')
+    rpkm_data_path = ensure_dir(DATA_PATH / 'rpkm_paired_end')
+    summary_data_path = ensure_dir(DATA_PATH / 'summary_paired_end')
     csv_filename = replace_extension(sam_path, 'csv').name
     rpkm_csv_path = rpkm_data_path / csv_filename
 
