@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from subprocess import check_call
 from pathlib import Path
 
-from utils import create_slurm_path
+from data_path_utils import create_slurm_path
 
 script_template = """
 #!/bin/bash

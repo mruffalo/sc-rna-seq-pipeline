@@ -19,8 +19,10 @@ import os
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
+from data_path_utils import ensure_dir
+
 from automated_bash import process_sra_file
-from utils import SCRATCH_PATH, USERNAME, ensure_dir
+from utils import SCRATCH_PATH, USERNAME
 
 FTP_HOST_DEFAULT = 'ftp.ncbi.nlm.nih.gov'
 

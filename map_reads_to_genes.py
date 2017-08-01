@@ -5,7 +5,7 @@ import pickle
 
 import pandas as pd
 
-from utils import DATA_PATH, ensure_dir, find_newest_data_path, replace_extension
+from data_path_utils import DATA_PATH, ensure_dir, find_newest_data_path, replace_extension
 
 def map_reads_to_genes(sam_path: Path):
     tree_path = find_newest_data_path('build_tree')

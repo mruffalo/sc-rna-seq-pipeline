@@ -4,9 +4,16 @@ from pathlib import Path
 from shutil import rmtree
 from subprocess import check_call, check_output
 
+from data_path_utils import (
+    append_to_filename,
+    ensure_dir,
+    pathlib_walk_glob,
+    replace_extension,
+)
+
 from map_reads_to_genes import map_reads_to_genes
 from paths import *
-from utils import SCRATCH_PATH, USERNAME, ensure_dir, pathlib_walk_glob, replace_extension, append_to_filename
+from utils import SCRATCH_PATH, USERNAME
 
 FASTQ_TEST_COMMAND_TEMPLATE = [
     '{fastq_dump_command}',

@@ -5,10 +5,9 @@ from pathlib import Path
 import pickle
 import re
 
+from data_path_utils import create_data_path
 from intervaltree import IntervalTree
 import pandas as pd
-
-from utils import create_data_path
 
 ccds_current_path = Path('~/data/ccds/current_mouse/CCDS.current.txt').expanduser()
 gene_set = set()
