@@ -46,7 +46,14 @@ NCBI_DOWNLOAD_PATH_KEY = '/repository/user/default-path'
 REQUIRED_DOWNLOAD_DIR = SCRATCH_PATH
 
 def check_ncbi_prefetch_location():
-    ncbi_config = read_ncbi_config()
+    try:
+        ncbi_config = read_ncbi_config()
+    except FileNotFoundError as e:
+        message = (
+            f"No NCBI configuration found at {NCBI_CONFIG_FILE_PATH}. Not downloading to user's home directory. "
+            "(Consider configuring this download location by running `vdb-config -i` from the SRA toolkit.)"
+        )
+        raise EnvironmentError(message) from e
     if NCBI_DOWNLOAD_PATH_KEY not in ncbi_config:
         message = f"No download path specified in {NCBI_CONFIG_FILE_PATH}. Not downloading to user's home directory."
         raise EnvironmentError(message)
