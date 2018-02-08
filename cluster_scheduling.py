@@ -41,7 +41,7 @@ def read_ncbi_config() -> Dict[str, str]:
             config_data[pieces[0].strip()] = pieces[1].strip().strip('"')
     return config_data
 
-NCBI_DOWNLOAD_PATH_KEY = '/repository/user/default-path'
+NCBI_DOWNLOAD_PATH_KEY = '/repository/user/main/public/root'
 # Download must be a subdirectory of this
 REQUIRED_DOWNLOAD_DIR = SCRATCH_PATH
 
