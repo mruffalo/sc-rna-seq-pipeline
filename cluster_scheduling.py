@@ -2,12 +2,10 @@
 from argparse import ArgumentParser
 from subprocess import check_call
 from pathlib import Path
-import shlex
-from typing import Dict
 
 from data_path_utils import create_slurm_path
 
-from utils import SCRATCH_PATH
+from ncbi_sra_toolkit_config import check_ncbi_prefetch_location
 
 script_template = """
 #!/bin/bash
@@ -16,7 +14,7 @@ script_template = """
 #SBATCH --mem=8192
 #SBATCH --mincpus={subprocesses}
 
-python3 process_sra_from_ftp.py -s {subprocesses} {ftp_list_file}
+python3 process_sra_from_srr_id.py -s {subprocesses} {ftp_list_file}
 """.strip()
 
 SBATCH_COMMAND_TEMPLATE = [
@@ -26,40 +24,6 @@ SBATCH_COMMAND_TEMPLATE = [
 ]
 
 SCRIPT_FILENAME = 'bulk_download.sh'
-
-NCBI_CONFIG_FILE_PATH = Path('~/.ncbi/user-settings.mkfg').expanduser()
-
-def read_ncbi_config() -> Dict[str, str]:
-    print('Reading NCBI download configuration from', NCBI_CONFIG_FILE_PATH)
-    config_data = {}
-    with open(NCBI_CONFIG_FILE_PATH) as f:
-        for line in f:
-            l = line.strip()
-            if l.startswith('#') or not l:
-                continue
-            pieces = l.split('=')
-            config_data[pieces[0].strip()] = pieces[1].strip().strip('"')
-    return config_data
-
-NCBI_DOWNLOAD_PATH_KEY = '/repository/user/main/public/root'
-# Download must be a subdirectory of this
-REQUIRED_DOWNLOAD_DIR = SCRATCH_PATH
-
-def check_ncbi_prefetch_location():
-    try:
-        ncbi_config = read_ncbi_config()
-    except FileNotFoundError as e:
-        message = (
-            f"No NCBI configuration found at {NCBI_CONFIG_FILE_PATH}. Not downloading to user's home directory. "
-            "(Consider configuring this download location by running `vdb-config -i` from the SRA toolkit.)"
-        )
-        raise EnvironmentError(message) from e
-    if NCBI_DOWNLOAD_PATH_KEY not in ncbi_config:
-        message = f"No download path specified in {NCBI_CONFIG_FILE_PATH}. Not downloading to user's home directory."
-        raise EnvironmentError(message)
-    download_path = Path(ncbi_config[NCBI_DOWNLOAD_PATH_KEY])
-    if REQUIRED_DOWNLOAD_DIR not in download_path.parents:
-        raise EnvironmentError(f'Not downloading to {download_path} (not a subdirectory of {REQUIRED_DOWNLOAD_DIR}).')
 
 def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str, subprocesses: int):
     slurm_path = create_slurm_path('cluster_scheduling')
