@@ -14,7 +14,7 @@ script_template = """
 #SBATCH --mem=8192
 #SBATCH --mincpus={subprocesses}
 
-python3 process_sra_from_srr_id.py -s {subprocesses} {ftp_list_file}
+python3 process_sra_from_srr_id.py -s {subprocesses} {srr_list_file}
 """.strip()
 
 SBATCH_COMMAND_TEMPLATE = [
@@ -25,14 +25,14 @@ SBATCH_COMMAND_TEMPLATE = [
 
 SCRIPT_FILENAME = 'bulk_download.sh'
 
-def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str, subprocesses: int):
+def queue_jobs(srr_list_file: Path, array_index_spec: str, pool: str, subprocesses: int):
     slurm_path = create_slurm_path('cluster_scheduling')
 
     script_file = slurm_path / SCRIPT_FILENAME
     print('Saving script to', script_file)
     with open(script_file, 'w') as f:
         script_content = script_template.format(
-            ftp_list_file=ftp_list_file,
+            srr_list_file=srr_list_file,
             pool=pool,
             subprocesses=subprocesses,
         )
@@ -50,11 +50,11 @@ def queue_jobs(ftp_list_file: Path, array_index_spec: str, pool: str, subprocess
 
 if __name__ == '__main__':
     p = ArgumentParser()
-    p.add_argument('ftp_list_file', type=Path)
+    p.add_argument('srr_list_file', type=Path)
     p.add_argument(
         'array_index_spec',
         help=(
-            'Selection of FTP URLs to process, in Slurm array format. Examples: "0-10", "1,3,5,7". '
+            'Selection of SRR IDs to process, in Slurm array format. Examples: "0-10", "1,3,5,7". '
             'Note that this parameter is not validated here and is passed as-is to the Slurm `sbatch` '
             'call. See https://slurm.schedmd.com/job_array.html for more information.'
         ),
@@ -64,4 +64,4 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     check_ncbi_prefetch_location()
-    queue_jobs(args.ftp_list_file, args.array_index_spec, args.pool, args.subprocesses)
+    queue_jobs(args.srr_list_file, args.array_index_spec, args.pool, args.subprocesses)
