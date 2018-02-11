@@ -13,6 +13,7 @@ script_template = """
 #SBATCH -p {pool}
 #SBATCH --mem=8192
 #SBATCH --mincpus={subprocesses}
+#SBATCH -o {stdout_path}
 
 python3 process_sra_from_srr_id.py -s {subprocesses} {srr_list_file}
 """.strip()
@@ -35,6 +36,7 @@ def queue_jobs(srr_list_file: Path, array_index_spec: str, pool: str, subprocess
             srr_list_file=srr_list_file,
             pool=pool,
             subprocesses=subprocesses,
+            stdout_path=script_file.with_suffix('.out')
         )
         print(script_content, file=f)
 
