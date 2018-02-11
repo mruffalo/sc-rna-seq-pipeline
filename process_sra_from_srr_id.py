@@ -35,7 +35,10 @@ def download_sra(srr_id: str) -> Path:
 
 def process_sra_from_srr_id(srr_id: str, subprocesses: int):
     local_path = download_sra(srr_id)
-    process_sra_file(local_path, subprocesses)
+    try:
+        process_sra_file(local_path, subprocesses)
+    finally:
+        local_path.unlink()
 
 def get_srr_id(srr_list_file: Path) -> str:
     """
