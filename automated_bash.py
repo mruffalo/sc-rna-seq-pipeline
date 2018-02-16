@@ -69,8 +69,8 @@ def is_paired_sra(sra_path: Path):
         ]
         print('Running', ' '.join(fastq_command))
         contents = check_output(fastq_command)
-    except:
-        raise Exception("Error running fastq-dump on", sra_path)
+    except Exception as e:
+        raise Exception(f"Error running fastq-dump on {sra_path}") from e
     enter = '\n'
     if contents.count(enter.encode()) == 4:
         return False
