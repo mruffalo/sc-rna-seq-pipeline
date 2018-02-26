@@ -103,7 +103,7 @@ def process_sra_file(sra_path: Path, subprocesses: int):
             fastq_path_1 = append_to_filename(fastq_path_1, '_1')
             fastq_path_2 = scratch_path / replace_extension(sra_path, 'fastq').name
             fastq_path_2 = append_to_filename(fastq_path_2, '_2')
-            sam_path = replace_extension(sra_path, 'sam')
+            sam_path = scratch_path / replace_extension(sra_path, 'sam').name
 
             hisat_command = [
                 piece.format(
