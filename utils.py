@@ -1,4 +1,5 @@
 from itertools import cycle, islice, zip_longest
+from math import ceil, log10
 from os import environ, getuid
 from pathlib import Path
 import pwd
@@ -73,5 +74,8 @@ def strip_prefix(string: str, prefix: str) -> str:
     if string.startswith(prefix):
         return string[len(prefix):]
     return string
+
+def digits(value: int) -> int:
+    return ceil(log10(value + 1))
 
 del T
