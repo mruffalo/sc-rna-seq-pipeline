@@ -59,7 +59,7 @@ def queue_jobs(srr_list_file: Path, pool: str, subprocesses: int):
         print(f'{i:0{srr_filename_digits}} Saving script to {script_file}')
         with open(script_file, 'w') as f:
             script_content = script_template.format(
-                srr_list_file=srr_list_file.absolute(),
+                srr_list_file=srr_sublist_path.absolute(),
                 pool=pool,
                 subprocesses=subprocesses,
                 stdout_path=script_file.with_suffix('.out')
