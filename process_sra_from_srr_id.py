@@ -56,7 +56,7 @@ def get_srr_id(srr_list_file: Path) -> str:
 
 if __name__ == '__main__':
     p = ArgumentParser()
-    p.add_argument('ftp_list_file', type=Path)
+    p.add_argument('srr_list_file', type=Path)
     p.add_argument(
         '-s',
         '--subprocesses',
@@ -66,5 +66,5 @@ if __name__ == '__main__':
     )
     args = p.parse_args()
 
-    srr_id = get_srr_id(args.ftp_list_file)
+    srr_id = get_srr_id(args.srr_list_file)
     process_sra_from_srr_id(srr_id, args.subprocesses)
