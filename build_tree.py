@@ -49,16 +49,9 @@ for gene, interval_data in intervals_by_gene.items():
         chrom_dict[chrom][1] = max(chrom_dict[chrom][1], end)
 
     for chrom in chrom_dict:
-        # Extend the start and end position to 1000bp.
-        if chrom_dict[chrom][0] > 1000:
-            chrom_dict[chrom][0] -= 1000
-        else:
-            chrom_dict[chrom][0] = 1
-        chrom_dict[chrom][1] += 1000
         # Set the label of a certain interval to be a certain gene.
         trees[chrom][chrom_dict[chrom][0]:chrom_dict[chrom][1]] = gene
-        # If a gene is located at different chroms, will it has different length?
-        # The unit of gene length would be kb.
+        # Kilobases, so divide by 1000
         gene_length.loc[gene] = (chrom_dict[chrom][1] - chrom_dict[chrom][0]) / 1000
 
 data_path = create_data_path('build_tree')
