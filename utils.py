@@ -5,11 +5,6 @@ from pathlib import Path
 import pwd
 from typing import Iterable, List, TypeVar
 
-if 'SSH_CONNECTION' in environ:
-    import matplotlib
-    matplotlib.use('Agg')
-
-
 DOWNLOAD_PATH = Path('download')
 
 # Depends on running on a Lane cluster node
