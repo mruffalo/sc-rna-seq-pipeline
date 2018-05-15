@@ -18,7 +18,7 @@ import os
 from pathlib import Path
 from subprocess import check_call
 
-from automated_bash import process_sra_file
+from alignment import process_sra_file
 from ncbi_sra_toolkit_config import get_ncbi_download_path
 
 def download_sra(srr_id: str) -> Path:
