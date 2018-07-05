@@ -1,21 +1,13 @@
 #!/usr/bin/env python3
-from argparse import ArgumentParser
 from pathlib import Path
-from shutil import rmtree
 from subprocess import check_call, check_output
 from typing import List, Optional, Tuple
 
-from data_path_utils import (
-    append_to_filename,
-    ensure_dir,
-    pathlib_walk_glob,
-    replace_extension,
-)
+from data_path_utils import append_to_filename
 import pandas as pd
 
 from map_reads_to_genes import map_reads_to_genes
 from paths import *
-from utils import SCRATCH_PATH, USERNAME
 
 FASTQ_TEST_COMMAND_TEMPLATE = [
     '{fastq_dump_command}',
