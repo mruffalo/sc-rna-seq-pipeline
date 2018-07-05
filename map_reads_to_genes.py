@@ -2,12 +2,13 @@
 import argparse
 from pathlib import Path
 import pickle
+from typing import Tuple
 
 import pandas as pd
 
-from data_path_utils import DATA_PATH, ensure_dir, find_newest_data_path, replace_extension
+from data_path_utils import find_newest_data_path
 
-def map_reads_to_genes(sam_path: Path):
+def map_reads_to_genes(sam_path: Path) -> Tuple[pd.Series, pd.Series]:
     tree_path = find_newest_data_path('build_tree')
     with open(tree_path / 'trees.pickle', 'rb') as f:
         tree_data = pickle.load(f)
@@ -16,14 +17,6 @@ def map_reads_to_genes(sam_path: Path):
         gene_length = tree_data['gene_length']
         intervals_by_gene = tree_data['intervals_by_gene']
 
-    # Save RPKM and summary CSV files to home directory, not wherever the SAM
-    # file is (probably somewhere in /scratch)
-    rpkm_data_path = ensure_dir(DATA_PATH / 'rpkm_paired_end')
-    summary_data_path = ensure_dir(DATA_PATH / 'summary_paired_end')
-    csv_filename = replace_extension(sam_path, 'csv').name
-    rpkm_csv_path = rpkm_data_path / csv_filename
-
-    # Read the SAM file of an alignment.
     read_counts = pd.Series(0, index=sorted(intervals_by_gene))
     reads_mapped_to_genes = 0
     reads_aligned = 0
@@ -64,8 +57,6 @@ def map_reads_to_genes(sam_path: Path):
                 read_counts.loc[gene_id.data] += 1
 
     rpkm = (read_counts * 1000000) / (reads_total * gene_length)
-    print('Saving RPKM values to', rpkm_csv_path)
-    rpkm.to_csv(str(rpkm_csv_path))
 
     gene_count = (read_counts > 0).sum()
 
@@ -77,9 +68,8 @@ def map_reads_to_genes(sam_path: Path):
             'genes_with_reads': gene_count,
         }
     )
-    summary_csv_path = summary_data_path / csv_filename
-    print('Saving summary data to', summary_csv_path)
-    summary_data.to_csv(str(summary_csv_path))
+
+    return rpkm, summary_data
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

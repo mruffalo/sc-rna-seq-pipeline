@@ -1,6 +1,6 @@
 from itertools import cycle, islice, zip_longest
 from math import ceil, log10
-from os import environ, getuid
+from os import getuid
 from pathlib import Path
 import pwd
 from typing import Iterable, List, TypeVar
@@ -39,12 +39,6 @@ def roundrobin(*iterables):
         except StopIteration:
             pending -= 1
             nexts = cycle(islice(nexts, pending))
-
-GIT_FILENAMES = {
-    'revision': 'revision.txt',
-    'staged_patch': 'staged.patch',
-    'unstaged_patch': 'unstaged.patch',
-}
 
 def sorted_set_op(items: Iterable[T], func) -> List[T]:
     sets = [set(item) for item in items]
