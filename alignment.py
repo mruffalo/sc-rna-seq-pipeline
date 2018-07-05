@@ -171,26 +171,7 @@ def align_fastq_compute_expr(
 def process_sra_file(
         sra_path: Path,
         subprocesses: int,
-        sam_path: Optional[Path]=None
+        sam_path: Optional[Path]=None,
 ) -> Tuple[pd.Series, pd.Series]:
-    fastq_paths = convert_sra_to_fastq(sra_path, subprocesses, sam_path)
-    return align_fastq_compute_expr(fastq_paths)
-
-def main(subprocesses: int):
-    # Walk through all SRA files in the directory
-    data_path = SCRATCH_PATH / USERNAME / 'data'
-    for sra_path in pathlib_walk_glob(data_path, '*.sra'):
-        process_sra_file(sra_path, subprocesses)
-
-if __name__ == '__main__':
-    p = ArgumentParser()
-    p.add_argument(
-        '-s',
-        '--subprocesses',
-        help='Number of subprocesses for alignment in each run of HISAT2',
-        type=int,
-        default=1,
-    )
-    args = p.parse_args()
-
-    main(args.subprocesses)
+    fastq_paths = convert_sra_to_fastq(sra_path)
+    return align_fastq_compute_expr(fastq_paths, subprocesses, sam_path)
