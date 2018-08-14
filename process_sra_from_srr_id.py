@@ -8,9 +8,6 @@ This file performs a single run of the following:
 4. Map reads to genes
 5. Convert counts to RPKM
 6. Save RPKM and summary data to the `data` directory
-
-It is intended that many runs of this file (with different FTP URLs)
-will be submitted to the cluster in parallel.
 """
 
 from argparse import ArgumentParser
