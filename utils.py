@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 from itertools import cycle, islice, zip_longest
 from math import ceil, log10
 from os import getuid
@@ -73,5 +74,36 @@ def normalize_whitespace(string: str) -> str:
     spaces (newlines, tabs, multiple spaces in a row, etc.)
     """
     return ' '.join(string.split())
+
+def add_common_command_line_arguments(p: ArgumentParser):
+    p.add_argument(
+        '-s',
+        '--subprocesses',
+        help='Number of subprocesses for alignment in each run of HISAT2',
+        type=int,
+        default=1,
+    )
+    p.add_argument('--reference-path', type=Path)
+    p.add_argument(
+        '--output-file',
+        type=Path,
+        help=normalize_whitespace(
+            """
+            Output file for gene expression and alignment metadata, saved in HDF5
+            format (.hdf5 or .h5 file extension recommended). If omitted, data will
+            be saved to 'expr.hdf5' inside the directory containing the FASTQ files.
+            """
+        ),
+    )
+    p.add_argument(
+        '--hisat2-options',
+        help=normalize_whitespace(
+            """
+            Extra options to pass to the HISAT2 aligner, passed as a single string.
+            If passing multiple options, you will likely need to enclose the HISAT2
+            options in quotes, e.g. --hisat2-options="--mp 4,2 --phred64"
+            """
+        ),
+    )
 
 del T

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This file performs a multiple runs of the following:
+This file performs multiple runs of the following:
 
 1. Align reads with HISAT2, in single- or paired-end as appropriate
 2. Map reads to genes
@@ -10,13 +10,13 @@ This file performs a multiple runs of the following:
 from argparse import ArgumentParser
 from collections import defaultdict
 from pathlib import Path
-import sys
+from pprint import pprint
 from typing import Dict, List
 
 import pandas as pd
 
 from alignment import align_fastq_compute_expr
-from utils import normalize_whitespace
+from utils import add_common_command_line_arguments, normalize_whitespace
 
 FASTQ_PATTERN = '*.fastq'
 
@@ -52,40 +52,8 @@ if __name__ == '__main__':
             """
         )
     )
-    p.add_argument(
-        '-s',
-        '--subprocesses',
-        help='Number of subprocesses for alignment in each run of HISAT2',
-        type=int,
-        default=1,
-    )
-    p.add_argument('--reference-path', type=Path)
-    p.add_argument(
-        '--output-file',
-        type=Path,
-        help=normalize_whitespace(
-            """
-            Output file for gene expression and alignment metadata, saved in HDF5
-            format (.hdf5 or .h5 file extension recommended). If omitted, data will
-            be saved to 'expr.hdf5' inside the directory containing the FASTQ files. 
-            """
-        ),
-    )
-    p.add_argument(
-        '--hisat2-options',
-        help=normalize_whitespace(
-            """
-            Extra options to pass to the HISAT2 aligner, passed as a single string.
-            If passing multiple options, you will likely need to enclose the HISAT2
-            options in quotes, e.g. --hisat2-options="--mp 4,2 --phred64"
-            """
-        ),
-    )
+    add_common_command_line_arguments(p)
     args = p.parse_args()
-
-    if len(args.fastq_file) not in {1, 2}:
-        message = 'One or two FASTQ files must be specified, for single- or paired-end alignment.'
-        sys.exit(message)
 
     all_rpkm = []
     all_alignment_metadata = []
@@ -99,6 +67,9 @@ if __name__ == '__main__':
         )
         all_rpkm.append(rpkm)
         all_alignment_metadata.append(alignment_metadata)
+
+        print(f'Alignment metadata for {fastq_group}:')
+        pprint(alignment_metadata)
 
     rpkm = pd.DataFrame(all_rpkm)
     alignment_metadata = pd.DataFrame(all_alignment_metadata)

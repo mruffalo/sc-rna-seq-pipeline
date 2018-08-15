@@ -9,46 +9,23 @@ This file performs a single run of the following:
 """
 from argparse import ArgumentParser
 from pathlib import Path
+from pprint import pprint
 import sys
 
 import pandas as pd
 
 from alignment import align_fastq_compute_expr
-from utils import normalize_whitespace
+from utils import add_common_command_line_arguments
 
 if __name__ == '__main__':
     p = ArgumentParser()
-    p.add_argument('fastq_file', type=Path, nargs='+')
     p.add_argument(
-        '-s',
-        '--subprocesses',
-        help='Number of subprocesses for alignment in each run of HISAT2',
-        type=int,
-        default=1,
-    )
-    p.add_argument('--reference-path', type=Path)
-    p.add_argument(
-        '--output-file',
+        'fastq_file',
         type=Path,
-        help=normalize_whitespace(
-            """
-            Output file for gene expression and alignment metadata, saved in HDF5
-            format (.hdf5 or .h5 file extension recommended). If omitted, data will
-            be saved to the same location as the first FASTQ file, but with file
-            extension .hdf5 instead of .fastq.
-            """
-        ),
+        nargs='+',
+        help='One or two paths to FASTQ files'
     )
-    p.add_argument(
-        '--hisat2-options',
-        help=normalize_whitespace(
-            """
-            Extra options to pass to the HISAT2 aligner, passed as a single string.
-            If passing multiple options, you will likely need to enclose the HISAT2
-            options in quotes, e.g. --hisat2-options="--mp 4,2 --phred64"
-            """
-        ),
-    )
+    add_common_command_line_arguments(p)
     args = p.parse_args()
 
     if len(args.fastq_file) not in {1, 2}:
@@ -61,6 +38,8 @@ if __name__ == '__main__':
         hisat2_options=args.hisat2_options,
         reference_path=args.reference_path
     )
+    print('Alignment metadata:')
+    pprint(alignment_metadata)
 
     if args.output_file is None:
         args.output_file = args.fastq_file[0].with_suffix('.hdf5')

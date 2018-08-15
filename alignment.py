@@ -169,6 +169,14 @@ def process_sra_file(
         sra_path: Path,
         subprocesses: int,
         sam_path: Optional[Path]=None,
+        hisat2_options: Optional[str] = None,
+        reference_path: Optional[Path] = None,
 ) -> Tuple[pd.Series, pd.Series]:
     fastq_paths = convert_sra_to_fastq(sra_path)
-    return align_fastq_compute_expr(fastq_paths, subprocesses, sam_path)
+    return align_fastq_compute_expr(
+        fastq_paths=fastq_paths,
+        subprocesses=subprocesses,
+        sam_path=sam_path,
+        hisat2_options=hisat2_options,
+        reference_path=reference_path,
+    )
