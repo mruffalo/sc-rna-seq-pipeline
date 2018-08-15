@@ -26,6 +26,7 @@ if __name__ == '__main__':
         type=int,
         default=1,
     )
+    p.add_argument('--reference-path', type=Path)
     p.add_argument(
         '--output-file',
         type=Path,
@@ -55,9 +56,10 @@ if __name__ == '__main__':
         sys.exit(message)
 
     rpkm, alignment_metadata = align_fastq_compute_expr(
-        args.fastq_file,
-        args.subprocesses,
+        fastq_paths=args.fastq_file,
+        subprocesses=args.subprocesses,
         hisat2_options=args.hisat2_options,
+        reference_path=args.reference_path
     )
 
     if args.output_file is None:
