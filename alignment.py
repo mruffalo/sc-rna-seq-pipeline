@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import shlex
 from subprocess import check_call, check_output
 from typing import List, Optional, Tuple
 
@@ -134,7 +135,7 @@ def align_fastq_compute_expr(
         for piece in HISAT2_COMMAND_COMMON_PIECES
     ]
     if hisat2_options is not None:
-        hisat_command.extend(hisat2_options.split())
+        hisat_command.extend(shlex.split(hisat2_options))
 
     if len(fastq_paths) == 2:
         hisat_command.extend(
