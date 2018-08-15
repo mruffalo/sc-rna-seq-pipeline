@@ -5,7 +5,7 @@ This file performs a single run of the following:
 1. Align reads with HISAT2, in single- or paired-end as appropriate
 2. Map reads to genes
 3. Convert counts to RPKM
-4. Save RPKM and summary data to the `data` directory
+4. Save RPKM and summary data
 """
 from argparse import ArgumentParser
 from pathlib import Path
