@@ -8,20 +8,34 @@ This file performs a multiple runs of the following:
 4. Save RPKM and summary data
 """
 from argparse import ArgumentParser
+from collections import defaultdict
 from pathlib import Path
 import sys
-from typing import List
+from typing import Dict, List
 
 import pandas as pd
 
 from alignment import align_fastq_compute_expr
 from utils import normalize_whitespace
 
+FASTQ_PATTERN = '*.fastq'
+
 def group_fastq_files(directory: Path) -> List[List[Path]]:
     """
     :param directory:
     :return:
     """
+    fastq_groups: Dict[str, List[Path]] = defaultdict(list)
+
+    for fastq_path in directory.glob(FASTQ_PATTERN):
+        filename_pieces = fastq_path.stem.rsplit('_', 1)
+        if len(filename_pieces) == 2 and filename_pieces[1] in {'1', '2'}:
+            key = filename_pieces[0]
+        else:
+            key = fastq_path.stem
+        fastq_groups[key].append(fastq_path)
+
+    return list(fastq_groups.values())
 
 if __name__ == '__main__':
     p = ArgumentParser()
