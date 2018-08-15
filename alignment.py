@@ -25,30 +25,26 @@ FASTQ_CONVERT_COMMAND_TEMPLATE = [
     '{output_path}',
 ]
 
-HISAT2_PAIRED_END_COMMAND_TEMPLATE = [
+HISAT2_COMMAND_COMMON_PIECES = [
     '{hisat2_command}',
     '-x',
     '{reference_path}',
-    '-1',
-    '{input_path_1}',
-    '-2',
-    '{input_path_2}',
     '-S',
     '{output_path}',
     '-p',
     '{subprocesses}',
 ]
 
-HISAT2_SINGLE_END_COMMAND_TEMPLATE = [
-    '{hisat2_command}',
-    '-x',
-    '{reference_path}',
+HISAT2_PAIRED_END_PIECES = [
+    '-1',
+    '{input_path_1}',
+    '-2',
+    '{input_path_2}',
+]
+
+HISAT2_SINGLE_END_PIECES = [
     '-U',
     '{input_path}',
-    '-S',
-    '{output_path}',
-    '-p',
-    '{subprocesses}',
 ]
 
 def is_paired_sra(sra_path: Path) -> bool:
@@ -113,7 +109,9 @@ def convert_sra_to_fastq(sra_path: Path, scratch_dir: Optional[Path]=None) -> Li
 def align_fastq_compute_expr(
         fastq_paths: List[Path],
         subprocesses: int,
-        sam_path: Optional[Path]=None
+        sam_path: Optional[Path]=None,
+        hisat2_options: Optional[str]=None,
+        reference_path: Optional[Path]=None,
 ) -> Tuple[pd.Series, pd.Series]:
     # Bail out early if no FASTQ files provided, so we can use the first
     # to assign `sam_path` if necessary
@@ -123,29 +121,36 @@ def align_fastq_compute_expr(
     if sam_path is None:
         sam_path = fastq_paths[0].with_suffix('.sam')
 
+    if reference_path is None:
+        reference_path = REFERENCE_INDEX_PATH
+
+    hisat_command = [
+        piece.format(
+            hisat2_command=HISAT2_PATH,
+            reference_path=reference_path,
+            output_path=sam_path,
+            subprocesses=subprocesses,
+        )
+        for piece in HISAT2_COMMAND_COMMON_PIECES
+    ]
+    if hisat2_options is not None:
+        hisat_command.extend(hisat2_options.split())
+
     if len(fastq_paths) == 2:
-        hisat_command = [
+        hisat_command.extend(
             piece.format(
-                hisat2_command=HISAT2_PATH,
-                reference_path=REFERENCE_INDEX_PATH,
                 input_path_1=fastq_paths[0],
                 input_path_2=fastq_paths[1],
-                output_path=sam_path,
-                subprocesses=subprocesses,
             )
-            for piece in HISAT2_PAIRED_END_COMMAND_TEMPLATE
-        ]
+            for piece in HISAT2_PAIRED_END_PIECES
+        )
     elif len(fastq_paths) == 1:
-        hisat_command = [
+        hisat_command.extend(
             piece.format(
-                hisat2_command=HISAT2_PATH,
-                reference_path=REFERENCE_INDEX_PATH,
                 input_path=fastq_paths[0],
-                output_path=sam_path,
-                subprocesses=subprocesses,
             )
-            for piece in HISAT2_SINGLE_END_COMMAND_TEMPLATE
-        ]
+            for piece in HISAT2_SINGLE_END_PIECES
+        )
     else:
         message_pieces = [f'Bad FASTQ file count: {len(fastq_paths)}']
         message_pieces.extend(f'\t{path}' for path in fastq_paths)

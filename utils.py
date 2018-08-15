@@ -67,4 +67,11 @@ def strip_prefix(string: str, prefix: str) -> str:
 def digits(value: int) -> int:
     return ceil(log10(value + 1))
 
+def normalize_whitespace(string: str) -> str:
+    """
+    :return: A new string with all whitespace normalized to single
+    spaces (newlines, tabs, multiple spaces in a row, etc.)
+    """
+    return ' '.join(string.split())
+
 del T
