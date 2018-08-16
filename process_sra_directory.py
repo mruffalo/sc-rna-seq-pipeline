@@ -48,7 +48,7 @@ if __name__ == '__main__':
     alignment_metadata = pd.DataFrame(all_alignment_metadata)
 
     if args.output_file is None:
-        args.output_file = args.fastq_file[0].with_suffix('.hdf5')
+        args.output_file = args.sra_directory / 'expr.hdf5'
 
     print('Saving expression and alignment metadata to', args.output_file)
     with pd.HDFStore(args.output_file) as store:
