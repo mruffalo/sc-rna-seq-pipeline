@@ -35,11 +35,8 @@ if __name__ == '__main__':
     all_alignment_metadata = []
 
     for sra_file in args.sra_directory.iterdir():
-        rpkm, summary = process_sra_file(args.sam_path, args.subprocesses)
-
-
-        rpkm, alignment_metadata = align_fastq_compute_expr(
-            fastq_paths=fastq_group,
+        rpkm, alignment_metadata = process_sra_file(
+            sra_path=sra_file,
             subprocesses=args.subprocesses,
             hisat2_options=args.hisat2_options,
             reference_path=args.reference_path
