@@ -24,7 +24,12 @@ if __name__ == '__main__':
     add_common_command_line_arguments(p)
     args = p.parse_args()
 
-    rpkm, alignment_metadata = process_sra_file(args.sam_path, args.subprocesses)
+    rpkm, alignment_metadata = process_sra_file(
+        sra_path=args.sra_path,
+        subprocesses=args.subprocesses,
+        hisat2_options=args.hisat2_options,
+        reference_path=args.reference_path,
+    )
     print('Alignment metadata:')
     pprint(alignment_metadata)
 
