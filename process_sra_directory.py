@@ -9,10 +9,7 @@ This file performs multiple runs of the following:
 5. Save RPKM and summary data
 """
 from argparse import ArgumentParser
-from collections import defaultdict
 from pathlib import Path
-import sys
-from typing import Dict, List
 
 import pandas as pd
 
@@ -34,7 +31,7 @@ if __name__ == '__main__':
     all_rpkm = []
     all_alignment_metadata = []
 
-    for sra_file in args.sra_directory.iterdir():
+    for sra_file in args.sra_directory.glob(SRA_PATTERN):
         rpkm, alignment_metadata = process_sra_file(
             sra_path=sra_file,
             subprocesses=args.subprocesses,
