@@ -19,10 +19,10 @@ from alignment import process_sra_file
 from utils import add_common_command_line_arguments
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('sra_path', type=Path, help='Path to SRA file')
+    p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('sra_path', type=Path, help='Path to SRA file')
     add_common_command_line_arguments(p)
-    args = parser.parse_args()
+    args = p.parse_args()
 
     rpkm, alignment_metadata = process_sra_file(args.sam_path, args.subprocesses)
     print('Alignment metadata:')
