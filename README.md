@@ -34,10 +34,10 @@ These scripts share some command-line arguments:
   If omitted, scripts will save alignment results to an appropriate place. See
   each script's `--help` information for details.
 * `--hisat2-options`: extra options passed directly to HISAT2. This must be
-  provided as a single string; this value will be split on whitespace and each
-  piece will be a separate argument/option to HISAT2. For multiple options,
-  it will probably be necessary to surround the option string in quotes. For
-  example: `--hisat2-options="--mp 4,2 --phred64"`
+  provided as a single string; this value will be split on whitespace with
+  shell quoting rules and each piece will be a separate argument/option to
+  HISAT2. For multiple options, it will probably be necessary to surround the
+  option string in quotes. For example: `--hisat2-options="--mp 4,2 --phred64"`
 
 # Data Requirements
 
