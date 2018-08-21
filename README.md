@@ -5,6 +5,8 @@ reads, mapping these reads to locations of known genes, and saving gene expressi
 and alignment metadata in HDF5 format. This data is suitable for input in the
 scQuery system at https://scquery.cs.cmu.edu/ .
 
+## Usage
+
 Multiple command-line scripts are provided, for different input types. These
 scripts share many command-line options, and ultimately save gene expression and
 alignment metadata in HDF5 format.
@@ -38,6 +40,18 @@ These scripts share some command-line arguments:
   example: `--hisat2-options="--mp 4,2 --phred64"`
 
 # Data Requirements
+
+## Short Read Alignment
+
+Expression data uploaded to the scQuery service must be aligned to the mouse
+genome, release `mm10`. A pre-built index for `mm10` can be downloaded from the
+HISAT2 website, but we recommend using a reference genome index which includes
+known splice sites. Such an index is available for download at
+https://giygas.compbio.cs.cmu.edu/mm10-splice-sites.tar . This archive can be
+extracted to any appropriate location, for use with the `--reference-path`
+script option described above.
+
+## Expression Quantification
 
 After alignment to a reference genome, reads are mapped to genes via a mapping from
 chromosome names to interval tree indexes. This index is built from the NCBI
