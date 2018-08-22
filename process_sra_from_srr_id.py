@@ -11,12 +11,13 @@ This file performs a single run of the following:
 """
 
 from argparse import ArgumentParser
-import os
 from pathlib import Path
 from subprocess import check_call
+from typing import Optional
 
 from alignment import process_sra_file
 from ncbi_sra_toolkit_config import get_ncbi_download_path
+from utils import add_common_command_line_arguments
 
 def download_sra(srr_id: str) -> Path:
     command = ['prefetch', srr_id]
@@ -30,38 +31,32 @@ def download_sra(srr_id: str) -> Path:
 
     return downloaded_path
 
-def process_sra_from_srr_id(srr_id: str, subprocesses: int):
+def process_sra_from_srr_id(
+        srr_id: str,
+        subprocesses: int,
+        hisat2_options: Optional[str]=None,
+        reference_path: Optional[Path]=None,
+):
     local_path = download_sra(srr_id)
     try:
-        process_sra_file(local_path, subprocesses)
+        process_sra_file(
+            sra_path=local_path,
+            subprocesses=subprocesses,
+            hisat2_options=hisat2_options,
+            reference_path=reference_path,
+        )
     finally:
         local_path.unlink()
 
-def get_srr_id(srr_list_file: Path) -> str:
-    """
-    Reads `srr_list_file` and returns the item selected by the SLURM_ARRAY_TASK_ID
-    environment variable. This is a separate function so the full list of URLs can
-    be garbage collected afterward -- I don't think this will use much memory at all,
-    but may as well not keep more things alive in memory than we need to.
-    """
-    with open(srr_list_file) as f:
-        srr_ids = [line.strip() for line in f]
-
-    file_index = int(os.environ['SLURM_ARRAY_TASK_ID'])
-
-    return srr_ids[file_index]
-
 if __name__ == '__main__':
     p = ArgumentParser()
-    p.add_argument('srr_list_file', type=Path)
-    p.add_argument(
-        '-s',
-        '--subprocesses',
-        help='Number of subprocesses for alignment in each run of HISAT2',
-        type=int,
-        default=1
-    )
+    p.add_argument('srr_id')
+    add_common_command_line_arguments(p)
     args = p.parse_args()
 
-    srr_id = get_srr_id(args.srr_list_file)
-    process_sra_from_srr_id(srr_id, args.subprocesses)
+    process_sra_from_srr_id(
+        srr_id=args.srr_id,
+        subprocesses=args.subprocesses,
+        hisat2_options=args.hisat2_options,
+        reference_path=args.reference_path,
+    )
