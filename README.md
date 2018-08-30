@@ -47,9 +47,9 @@ Expression data uploaded to the scQuery service must be aligned to the mouse
 genome, release `mm10`. A pre-built index for `mm10` can be downloaded from the
 HISAT2 website, but we recommend using a reference genome index which includes
 known splice sites. Such an index is available for download at
-https://giygas.compbio.cs.cmu.edu/mm10-splice-sites.tar . This archive can be
-extracted to any appropriate location, for use with the `--reference-path`
-script option described above.
+https://s3.amazonaws.com/scquery/processed_data/mm10-splice-sites.tar . This
+archive can be extracted to any appropriate location, for use with the
+`--reference-path` script option described above.
 
 ## Expression Quantification
 
@@ -60,8 +60,8 @@ ftp://ftp.ncbi.nih.gov/pub/CCDS/current_mouse/CCDS.current.txt
 
 If desired, one can build this index from a local copy of the CCDS database, using
 the `build_tree.py` script. For convenience, a prebuilt index is also available at
-https://giygas.compbio.cs.cmu.edu/mouse-ccds-index.tar.xz -- this archive should
-be extracted to the same directory containing this README file.
+https://s3.amazonaws.com/scquery/processed_data/mouse-ccds-index.tar.xz -- this
+archive should be extracted to the same directory containing this README file.
 
 # Software Requirements
 
