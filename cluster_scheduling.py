@@ -17,7 +17,7 @@ script_template = """
 #SBATCH --mincpus={subprocesses}
 #SBATCH -o {stdout_path}
 
-python3 process_sra_from_srr_id.py -s {subprocesses} {srr_list_file}
+python3 process_sra_from_srr_list.py -s {subprocesses} {srr_list_file}
 """.strip()
 
 SBATCH_COMMAND_TEMPLATE = [
