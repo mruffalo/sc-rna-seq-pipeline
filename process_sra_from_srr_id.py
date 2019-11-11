@@ -19,6 +19,8 @@ from alignment import process_sra_file
 from ncbi_sra_toolkit_config import get_ncbi_download_path
 from utils import add_common_command_line_arguments
 
+from .paths import OUTPUT_PATH
+
 def download_sra(srr_id: str) -> Path:
     command = ['prefetch', srr_id]
     print('Running', ' '.join(command))
@@ -39,7 +41,7 @@ def process_sra_from_srr_id(
 ):
     local_path = download_sra(srr_id)
     try:
-        process_sra_file(
+        rpkm, summary = process_sra_file(
             sra_path=local_path,
             subprocesses=subprocesses,
             hisat2_options=hisat2_options,
@@ -47,6 +49,7 @@ def process_sra_from_srr_id(
         )
     finally:
         local_path.unlink()
+    return rpkm, summary
 
 if __name__ == '__main__':
     p = ArgumentParser()
@@ -54,9 +57,17 @@ if __name__ == '__main__':
     add_common_command_line_arguments(p)
     args = p.parse_args()
 
-    process_sra_from_srr_id(
+    rpkm, summary = process_sra_from_srr_id(
         srr_id=args.srr_id,
         subprocesses=args.subprocesses,
         hisat2_options=args.hisat2_options,
         reference_path=args.reference_path,
     )
+
+    filename = f'{args.SRR_ID}.csv'
+
+    rpkm_dir = OUTPUT_PATH / 'rpkm'
+    summary_dir = OUTPUT_PATH / 'summary'
+
+    rpkm.to_csv(rpkm_dir / filename)
+    summary.to_csv(summary_dir / filename)
