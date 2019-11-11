@@ -19,7 +19,7 @@ from alignment import process_sra_file
 from ncbi_sra_toolkit_config import get_ncbi_download_path
 from utils import add_common_command_line_arguments
 
-from .paths import OUTPUT_PATH
+from paths import OUTPUT_PATH
 
 def download_sra(srr_id: str) -> Path:
     command = ['prefetch', srr_id]
