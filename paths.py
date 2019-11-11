@@ -10,7 +10,7 @@ HISAT2_PATH = _Path('hisat2')
 # Not an actual file on disk; this is the "base" name
 REFERENCE_INDEX_PATH = _Path('~/data/hisat2-indexes/mm10-splice-sites/mm10').expanduser()
 
-OUTPUT_PATH = _Path('~/data/expr-processed').expanduser()
+OUTPUT_PATH = _Path('~/data/rna-seq-pipeline').expanduser()
 
 del _Path
 
