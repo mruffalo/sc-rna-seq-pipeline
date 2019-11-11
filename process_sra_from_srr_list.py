@@ -14,11 +14,12 @@ from argparse import ArgumentParser
 import os
 from pathlib import Path
 from subprocess import check_call
+from typing import Optional
 
 from alignment import process_sra_file
 from ncbi_sra_toolkit_config import get_ncbi_download_path
-
 from paths import OUTPUT_PATH
+from utils import add_common_command_line_arguments
 
 def download_sra(srr_id: str) -> Path:
     command = [
@@ -35,12 +36,23 @@ def download_sra(srr_id: str) -> Path:
 
     return downloaded_path
 
-def process_sra_from_srr_id(srr_id: str, subprocesses: int):
+def process_sra_from_srr_id(
+        srr_id: str,
+        subprocesses: int,
+        hisat2_options: Optional[str]=None,
+        reference_path: Optional[Path]=None,
+):
     local_path = download_sra(srr_id)
     try:
-        return process_sra_file(local_path, subprocesses)
+        rpkm, summary = process_sra_file(
+            sra_path=local_path,
+            subprocesses=subprocesses,
+            hisat2_options=hisat2_options,
+            reference_path=reference_path,
+        )
     finally:
         local_path.unlink()
+    return rpkm, summary
 
 def get_srr_id(srr_list_file: Path) -> str:
     """
@@ -59,13 +71,7 @@ def get_srr_id(srr_list_file: Path) -> str:
 if __name__ == '__main__':
     p = ArgumentParser()
     p.add_argument('srr_list_file', type=Path)
-    p.add_argument(
-        '-s',
-        '--subprocesses',
-        help='Number of subprocesses for alignment in each run of HISAT2',
-        type=int,
-        default=1
-    )
+    add_common_command_line_arguments(p)
     args = p.parse_args()
 
     srr_id = get_srr_id(args.srr_list_file)
