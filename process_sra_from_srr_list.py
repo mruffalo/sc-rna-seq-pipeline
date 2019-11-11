@@ -82,7 +82,7 @@ if __name__ == '__main__':
         reference_path=args.reference_path,
     )
 
-    filename = f'{args.SRR_ID}.csv'
+    filename = f'{srr_id}.csv'
 
     rpkm_dir = OUTPUT_PATH / 'rpkm'
     summary_dir = OUTPUT_PATH / 'summary'
